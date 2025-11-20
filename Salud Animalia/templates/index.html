@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salud Animalia — Inicio</title>
+<link rel="stylesheet" href="/static/styles.css">
+
+<header class="header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Salud Animalia inicio">
+        <span class="logo">❤</span> Salud Animalia
+      </a>
+      <nav class="links" aria-label="Principal" id="mainNav">
+        <a href="servicios">Servicios</a>
+        <a href="nosotros">Nosotros</a>
+        <a href="contacto">Contacto</a>
+        <a class="btn light" href="login" id="loginBtn">Iniciar Sesión</a>
+        <span class="user-info" id="userInfo" style="display:none;">
+          <a class="btn light" href="#" id="logoutBtn">Cerrar Sesión</a>
+        </span>
+      </nav>
+    </div>
+</header>
+
+<section class="hero hero-center">
+    <div class="container">
+        <span class="badge">Cuidados con tecnología 2025</span>
+        <h1>Bienvenido a <span style="color:var(--brand)">Salud Animalia</span></h1>
+        <p>Cuidamos de tus mascotas como si fueran nuestras. Servicios veterinarios profesionales con amor y dedicación.</p>
+        <div class="cta">
+            <a class="btn" href="cita">Agendar una Cita</a>
+            <a class="btn secondary" href="nosotros">Conocer Más</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2>Nuestros Servicios</h2>
+        <p class="lead">Ofrecemos atención integral para el bienestar de tus mascotas</p>
+        <div class="grid cols-3">
+            <article class="card">
+                <div class="i teal">🩺</div>
+                <h3>Consulta General</h3>
+                <p>Exámenes de rutina y diagnóstico temprano para mantener a salvo a tu mascota.</p>
+            </article>
+            <article class="card">
+                <div class="i peach">💉</div>
+                <h3>Vacunación</h3>
+                <p>Plan de vacunas actualizado para prevenir enfermedades infecciosas.</p>
+            </article>
+            <article class="card">
+                <div class="i rose">🩻</div>
+                <h3>Cirugía</h3>
+                <p>Procedimientos quirúrgicos con tecnología avanzada y cuidados posoperatorios.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container grid cols-2">
+        <div>
+            <span class="badge">Experiencia y Confianza</span>
+            <h2>Más de 10 años cuidando a tus mascotas</h2>
+            <p class="lead">Entendemos que son parte de tu familia. Por eso ofrecemos atención personalizada y adoptamos las mejores prácticas veterinarias.</p>
+            <div class="kpis">
+                <div class="kpi">
+                    <div class="val">5000+</div>
+                    <div class="lbl">Mascotas Atendidas</div>
+                </div>
+                <div class="kpi">
+                    <div class="val">98%</div>
+                    <div class="lbl">Satisfacción</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://img.freepik.com/foto-gratis/cerca-veterinario-cuidando-perro_23-2149100178.jpg" alt="Veterinaria cuidando a un perro">
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container footer-inner section">
+        <div>
+            <h3 class="brand"><span class="logo">❤</span> Salud Animalia</h3>
+            <small>Cuidando a tus mascotas desde 2014 con amor, profesionalismo y dedicación.</small>
+        </div>
+        <div>
+            <h4>Servicios</h4>
+            <ul>
+                <li>Consulta General</li>
+                <li>Vacunación</li>
+                <li>Odontología</li>
+                <li>Cirugía</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Contacto</h4>
+            <ul>
+                <li>+1 (555) 123-4567</li>
+                <li>info@saludanimalia.com</li>
+                <li>Av. Principal 123, Ciudad</li>
+            </ul>
+            <small>© 2025 Salud Animalia. Todos los derechos reservados.</small>
+        </div>
+    </div>
+</footer>
+
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.removeItem('user');
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+</html>

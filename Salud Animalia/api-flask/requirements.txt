@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+PyMySQL
+mysqlclient
+python-dotenv
+gunicorn
+Marshmallow
+flask-marshmallow
+marshmallow
+marshmallow-sqlalchemy
+flask-cors

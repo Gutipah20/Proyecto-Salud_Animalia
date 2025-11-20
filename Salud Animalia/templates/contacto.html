@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contacto — Salud Animalia</title>
+<link rel="stylesheet" href="/static/styles.css">
+
+<header class="header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Salud Animalia inicio">
+        <span class="logo">❤</span> Salud Animalia
+      </a>
+      <nav class="links" aria-label="Principal" id="mainNav">
+        <a href="servicios">Servicios</a>
+        <a href="nosotros">Nosotros</a>
+        <a href="contacto">Contacto</a>
+        <a class="btn light" href="login" id="loginBtn">Iniciar Sesión</a>
+        <span class="user-info" id="userInfo" style="display:none;">
+          <a class="btn light" href="#" id="logoutBtn">Cerrar Sesión</a>
+        </span>
+      </nav>
+    </div>
+</header>
+
+<section class="hero hero-center hero-slim">
+  <div class="container">
+    <h1>Contacto</h1>
+    <p class="lead">Escríbenos y con gusto te atenderemos.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid cols-2">
+    <form class="form">
+      <h3>Enviar mensaje</h3>
+      <div class="inline">
+        <div class="field"><label>Nombre</label><input placeholder="Tu nombre"></div>
+        <div class="field"><label>Correo</label><input type="email" placeholder="tu@email.com"></div>
+      </div>
+      <div class="field"><label>Asunto</label><input placeholder="Consulta"></div>
+      <div class="field"><label>Mensaje</label><textarea rows="5" placeholder="Cuéntanos en qué podemos ayudarte"></textarea></div>
+      <button class="btn" type="button">Enviar</button>
+    </form>
+    <div class="card">
+      <h3>Información</h3>
+      <ul>
+        <li>📍 Av. Principal 123, Ciudad</li>
+        <li>📞 +1 (555) 123‑4567</li>
+        <li>✉️ info@saludanimalia.com</li>
+      </ul>
+      <div class="kpis"><div class="kpi"><div class="val">24/7</div><div class="lbl">Emergencias</div></div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner section">
+    <div>
+      <h3 class="brand"><span class="logo">❤</span> Salud Animalia</h3>
+      <small>Cuidando a tus mascotas desde 2014 con amor, profesionalismo y dedicación.</small>
+    </div>
+    <div>
+      <h4>Servicios</h4>
+      <ul>
+        <li>Consulta General</li>
+        <li>Vacunación</li>
+        <li>Odontología</li>
+        <li>Cirugía</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li>+1 (555) 123-4567</li>
+        <li>info@saludanimalia.com</li>
+        <li>Av. Principal 123, Ciudad</li>
+      </ul>
+      <small>© 2025 Salud Animalia. Todos los derechos reservados.</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.removeItem('user');
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+</html>

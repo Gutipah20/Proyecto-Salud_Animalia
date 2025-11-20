@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Servicios — Salud Animalia</title>
+<link rel="stylesheet" href="/static/styles.css">
+
+<header class="header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Salud Animalia inicio">
+        <span class="logo">❤</span> Salud Animalia
+      </a>
+      <nav class="links" aria-label="Principal" id="mainNav">
+        <a href="servicios">Servicios</a>
+        <a href="nosotros">Nosotros</a>
+        <a href="contacto">Contacto</a>
+        <a class="btn light" href="login" id="loginBtn">Iniciar Sesión</a>
+        <span class="user-info" id="userInfo" style="display:none;">
+          <a class="btn light" href="#" id="logoutBtn">Cerrar Sesión</a>
+        </span>
+      </nav>
+    </div>
+</header>
+
+<section class="hero hero-center hero-slim">
+  <div class="container">
+    <span class="badge">Servicios Veterinarios</span>
+    <h1>Nuestros Servicios Veterinarios</h1>
+    <p class="lead">Una amplia gama de servicios para mantener a tus mascotas saludables y felices.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid cols-3">
+    <article class="card"><div class="i teal">🩺</div><h3>Consulta General</h3><ul>
+      <li>Examen de salud completo</li><li>Detección temprana</li><li>Plan preventivo</li></ul></article>
+    <article class="card"><div class="i peach">💉</div><h3>Vacunación</h3><ul>
+      <li>Calendario personalizado</li><li>Vacunas seguras</li><li>Seguimiento</li></ul></article>
+    <article class="card"><div class="i sky">🦷</div><h3>Odontología</h3><ul>
+      <li>Limpieza dental</li><li>Tratamiento de encías</li><li>Educación en higiene</li></ul></article>
+    <article class="card"><div class="i rose">🩻</div><h3>Cirugía</h3><ul>
+      <li>Procedimientos comunes</li><li>Monitoreo avanzado</li><li>Cuidados postoperatorios</li></ul></article>
+    <article class="card"><div class="i teal">🧪</div><h3>Laboratorio</h3><ul>
+      <li>Análisis de sangre</li><li>Perfil renal y hepático</li><li>Resultados rápidos</li></ul></article>
+    <article class="card"><div class="i peach">🚑</div><h3>Emergencias</h3><ul>
+      <li>Atención 24/7</li><li>Estabilización</li><li>Derivación oportuna</li></ul></article>
+  </div>
+</section>
+
+<section class="hero hero-center hero-slim">
+  <div class="container">
+    <h2>¿Necesitas atención para tu mascota?</h2>
+    <div class="cta"><a class="btn" href="cita">Agendar Cita</a><a class="btn secondary" href="contacto">Contactar</a></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner section">
+    <div>
+      <h3 class="brand"><span class="logo">❤</span> Salud Animalia</h3>
+      <small>Cuidando a tus mascotas desde 2014 con amor, profesionalismo y dedicación.</small>
+    </div>
+    <div>
+      <h4>Servicios</h4>
+      <ul>
+        <li>Consulta General</li>
+        <li>Vacunación</li>
+        <li>Odontología</li>
+        <li>Cirugía</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li>+1 (555) 123-4567</li>
+        <li>info@saludanimalia.com</li>
+        <li>Av. Principal 123, Ciudad</li>
+      </ul>
+      <small>© 2025 Salud Animalia. Todos los derechos reservados.</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.removeItem('user');
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+</html>

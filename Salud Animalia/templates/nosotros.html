@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nosotros — Salud Animalia</title>
+<link rel="stylesheet" href="/static/styles.css">
+
+<header class="header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="Salud Animalia inicio">
+        <span class="logo">❤</span> Salud Animalia
+      </a>
+      <nav class="links" aria-label="Principal" id="mainNav">
+        <a href="servicios">Servicios</a>
+        <a href="nosotros">Nosotros</a>
+        <a href="contacto">Contacto</a>
+        <a class="btn light" href="login" id="loginBtn">Iniciar Sesión</a>
+        <span class="user-info" id="userInfo" style="display:none;">
+          <a class="btn light" href="#" id="logoutBtn">Cerrar Sesión</a>
+        </span>
+      </nav>
+    </div>
+</header>
+
+<section class="hero hero-slim">
+  <div class="container">
+    <span class="badge">Nuestra Historia</span>
+    <h1>Conoce a salud animal</h1>
+    <p class="lead">Más de una década dedicada al cuidado y bienestar de las mascotas con pasión, profesionalismo y amor.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid cols-2">
+    <div>
+      <span class="badge">Misión y Visión</span>
+      <h2>Cuidamos a tus mascotas como familia</h2>
+      <p>Desde 2014 brindamos atención veterinaria de alta calidad, combinando experiencia clínica y calidez humana.</p>
+      <div class="kpis">
+        <div class="kpi"><div class="val">10+</div><div class="lbl">Años de Experiencia</div></div>
+        <div class="kpi"><div class="val">5000+</div><div class="lbl">Mascotas felices</div></div>
+      </div>
+    </div>
+    <div class="card"><img src="https://www.clinicaveterinariaejea.com/wp-content/uploads/2020/03/Equipo-Clinica-Veterinaria-Ejea-1.jpeg" alt="Equipo veterinario"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid cols-4">
+    <article class="card"><div class="i teal">💚</div><h3>Compasión</h3><p>Tratamos a cada mascota con amor y cuidados, como parte de nuestra propia familia.</p></article>
+    <article class="card"><div class="i sky">🏆</div><h3>Excelencia</h3><p>Atención basada en evidencia y actualización continua.</p></article>
+    <article class="card"><div class="i peach">🤝</div><h3>Confianza</h3><p>Relación transparente y ética con nuestros pacientes y sus familias.</p></article>
+    <article class="card"><div class="i rose">🏘</div><h3>Comunidad</h3><p>Acciones de bienestar animal y educación en la ciudad.</p></article>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner section">
+    <div>
+      <h3 class="brand"><span class="logo">❤</span> Salud Animalia</h3>
+      <small>Cuidando a tus mascotas desde 2014 con amor, profesionalismo y dedicación.</small>
+    </div>
+    <div>
+      <h4>Servicios</h4>
+      <ul>
+        <li>Consulta General</li>
+        <li>Vacunación</li>
+        <li>Odontología</li>
+        <li>Cirugía</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li>+1 (555) 123-4567</li>
+        <li>info@saludanimalia.com</li>
+        <li>Av. Principal 123, Ciudad</li>
+      </ul>
+      <small>© 2025 Salud Animalia. Todos los derechos reservados.</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.removeItem('user');
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+</html>

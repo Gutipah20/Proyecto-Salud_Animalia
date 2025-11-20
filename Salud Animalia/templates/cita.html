@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agendar Cita — Salud Animalia</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container nav">
+        <a class="brand" href="/" aria-label="Salud Animalia inicio">
+          <span class="logo">❤</span> Salud Animalia
+        </a>
+        <nav class="links" aria-label="Principal" id="mainNav">
+          <a href="servicios">Servicios</a>
+          <a href="nosotros">Nosotros</a>
+          <a href="contacto">Contacto</a>
+          <a class="btn light" href="login" id="loginBtn">Iniciar Sesión</a>
+          <span class="user-info" id="userInfo" style="display: none">
+            <span id="userName" style="margin-right: 1rem"></span>
+            <a class="btn light" href="#" id="logoutBtn">Cerrar Sesión</a>
+          </span>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero hero-slim">
+      <div class="container">
+        <span class="badge">Reserva tu atención</span>
+        <h1>Reserva una Cita</h1>
+        <p class="lead">
+          Programa la atención que tu mascota necesita. Nuestro equipo estará
+          encantado de cuidarla.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid cols-2">
+        <form class="form" id="form-reserva" aria-label="Formulario de cita">
+          <h3>Información de la Cita</h3>
+          <small class="help"
+            >Completa el formulario para agendar tu visita.</small
+          >
+
+          <div class="card" style="padding: 14px">
+            <h4 style="margin: 0.2rem 0">Información de la Mascota</h4>
+            <div class="field">
+              <label>Nombre de la Mascota *</label>
+              <input
+                id="res-mascota"
+                placeholder="Ej: Luna, Max, Firulais"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="card" style="padding: 14px">
+            <h4 style="margin: 0.2rem 0">Detalles de la Cita</h4>
+            <div class="field">
+              <label>Motivo / Servicio *</label>
+              <input
+                id="res-motivo"
+                placeholder="Ej: Consulta General, Vacunación"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Fecha y Hora *</label>
+              <input id="res-fecha" type="datetime-local" required />
+            </div>
+          </div>
+
+          <button class="btn" type="submit" id="btn-submit">
+            Agendar Cita
+          </button>
+        </form>
+
+        <aside class="sidebar">
+          <div class="card">
+            <h3>Mis Reservas</h3>
+            <div id="mis-reservas" style="max-height: 400px; overflow-y: auto">
+              <p class="help">Cargando reservas...</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>¿Necesitas Ayuda?</h3>
+            <p class="help">Llámanos o escríbenos por WhatsApp.</p>
+            <ul>
+              <li>📞 +1 (555) 123‑4567</li>
+              <li>✉️ info@saludanimalia.com</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer-inner section">
+        <div>
+          <h3 class="brand"><span class="logo">❤</span> Salud Animalia</h3>
+          <small>Cuidando a tus mascotas desde 2014.</small>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      async function apiRequest(path, method = 'GET', data = null) {
+        const opts = {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+        };
+        if (data) opts.body = JSON.stringify(data);
+
+        try {
+          const res = await fetch(path, opts);
+          const json = await res.json();
+          return json;
+        } catch (error) {
+          console.error('🔴 API Error:', error);
+          return { ok: false, error: 'Error de conexión' };
+        }
+      }
+
+      async function crearReserva(e) {
+        e.preventDefault();
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+          alert('Debes iniciar sesión primero');
+          window.location.href = '/login';
+          return;
+        }
+
+        const mascota = document.getElementById('res-mascota').value.trim();
+        const motivo = document.getElementById('res-motivo').value.trim();
+        const fechaInput = document.getElementById('res-fecha').value;
+
+        if (!mascota || !motivo || !fechaInput) {
+          alert('Por favor completa todos los campos obligatorios');
+          return;
+        }
+
+        const fechaLocal = new Date(fechaInput);
+        const fecha = fechaLocal.toISOString();
+
+        const submitBtn = document.getElementById('btn-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Agendando...';
+
+        try {
+          const res = await apiRequest('/api/reservas', 'POST', {
+            user_id: user.id,
+            mascota: mascota,
+            motivo: motivo,
+            fecha: fecha,
+          });
+
+          if (res.ok) {
+            alert('✅ ¡Cita agendada exitosamente!');
+            document.getElementById('form-reserva').reset();
+            await cargarMisReservas();
+          } else {
+            alert('❌ ' + (res.error || 'No se pudo crear la reserva'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('❌ Error al crear la reserva: ' + error.message);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Agendar Cita';
+        }
+      }
+
+      async function cargarMisReservas() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) return;
+
+        const container = document.getElementById('mis-reservas');
+
+        try {
+          const res = await apiRequest(
+            `/api/reservas?user_id=${user.id}`,
+            'GET'
+          );
+
+          if (res.ok && res.reservas && res.reservas.length > 0) {
+            container.innerHTML = res.reservas
+              .map((r) => {
+                const fecha = new Date(r.fecha);
+                const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+
+                return `
+            <div class="card" style="padding: 12px; margin-bottom: 10px; background: #f9f9f9;">
+              <h4 style="margin: 0 0 8px 0; color: var(--brand);">🐾 ${r.mascota}</h4>
+              <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Motivo:</strong> ${r.motivo}</p>
+              <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Fecha:</strong> ${fechaFormateada}</p>
+              <button class="btn" onclick="eliminarReserva(${r.id})" 
+                      style="margin-top: 8px; padding: 6px 12px; font-size: 0.85rem; background: #dc3545;">
+                Cancelar Cita
+              </button>
+            </div>
+          `;
+              })
+              .join('');
+          } else {
+            container.innerHTML =
+              '<p class="help">No tienes reservas agendadas.</p>';
+          }
+        } catch (error) {
+          console.error('Error al cargar reservas:', error);
+          container.innerHTML =
+            '<p class="help">Error al cargar las reservas.</p>';
+        }
+      }
+
+      async function eliminarReserva(id) {
+        if (!confirm('¿Estás seguro de cancelar esta cita?')) return;
+
+        try {
+          const res = await apiRequest(`/api/reservas/${id}`, 'DELETE');
+
+          if (res.ok) {
+            alert('✅ Cita cancelada exitosamente');
+            await cargarMisReservas();
+          } else {
+            alert('❌ ' + (res.error || 'No se pudo cancelar la cita'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('❌ Error al cancelar la cita');
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        const loginBtn = document.getElementById('loginBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        if (user) {
+          loginBtn.style.display = 'none';
+          userInfo.style.display = 'flex';
+          userName.textContent = `Hola, ${user.name}`;
+
+          cargarMisReservas();
+
+          logoutBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            localStorage.removeItem('user');
+            alert('Sesión cerrada');
+            window.location.href = '/';
+          });
+        } else {
+          alert('⚠️ Debes iniciar sesión para agendar una cita');
+          window.location.href = '/login';
+        }
+
+        document
+          .getElementById('form-reserva')
+          .addEventListener('submit', crearReserva);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Administrador - Salud Animalia</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container nav">
+        <a class="brand" href="/" aria-label="Salud Animalia inicio">
+          <span class="logo">❤</span> Salud Animalia
+        </a>
+        <nav class="links" aria-label="Principal">
+          <span style="color: var(--brand); font-weight: 600"
+            >Panel Administrador</span
+          >
+          <button class="btn light" onclick="cerrarSesion()">
+            Cerrar Sesión
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div style="margin-bottom: 2rem">
+          <h1 style="margin: 0 0 0.5rem">Panel del Administrador</h1>
+          <p class="lead">
+            Gestiona reservas y usuarios registrados en el sistema
+          </p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="grid cols-3" style="margin-bottom: 2rem">
+          <div class="card">
+            <div class="i teal" style="margin-bottom: 0.8rem">👥</div>
+            <div class="kpi">
+              <div class="val" id="num-users">0</div>
+              <div class="lbl">Usuarios Registrados</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="i peach" style="margin-bottom: 0.8rem">📅</div>
+            <div class="kpi">
+              <div class="val" id="num-reservas">0</div>
+              <div class="lbl">Reservas Totales</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="i sky" style="margin-bottom: 0.8rem">⏰</div>
+            <div class="kpi">
+              <div class="val" id="num-pendientes">0</div>
+              <div class="lbl">Reservas Pendientes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div
+          style="
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--stroke);
+          "
+        >
+          <button
+            class="tab-btn active"
+            onclick="cambiarTab('reservas')"
+            id="tab-reservas"
+          >
+            Gestionar Reservas
+          </button>
+          <button
+            class="tab-btn"
+            onclick="cambiarTab('usuarios')"
+            id="tab-usuarios"
+          >
+            Ver Usuarios
+          </button>
+        </div>
+
+        <!-- Panel: Reservas -->
+        <div id="panel-reservas" class="tab-panel active">
+          <div class="card" style="margin-bottom: 1rem">
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <input
+                type="text"
+                id="filtro-reservas"
+                placeholder="Buscar por mascota, motivo o usuario..."
+                style="flex: 1; min-width: 250px"
+              />
+              <button class="btn" onclick="cargarReservasAdmin()">
+                🔍 Buscar
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Reservas Registradas</h3>
+            <div style="overflow-x: auto">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Mascota</th>
+                    <th>Motivo</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-reservas">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem">
+                      Cargando reservas...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Usuarios -->
+        <div id="panel-usuarios" class="tab-panel" style="display: none">
+          <div class="card" style="margin-bottom: 1rem">
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <input
+                type="text"
+                id="filtro-usuarios"
+                placeholder="Buscar por nombre o email..."
+                style="flex: 1; min-width: 250px"
+              />
+              <button class="btn" onclick="cargarUsuariosAdmin()">
+                🔍 Buscar
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Usuarios Registrados</h3>
+            <div style="overflow-x: auto">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Reservas</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-usuarios">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem">
+                      Cargando usuarios...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal para Editar Reserva -->
+    <div
+      id="modal-editar"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="card"
+        style="width: min(500px, 90%); max-height: 90vh; overflow-y: auto"
+      >
+        <h3>Editar Reserva #<span id="edit-id"></span></h3>
+        <form
+          id="form-editar"
+          class="form"
+          style="padding: 0; border: none; box-shadow: none"
+        >
+          <div class="field">
+            <label>Mascota</label>
+            <input type="text" id="edit-mascota" required />
+          </div>
+          <div class="field">
+            <label>Motivo</label>
+            <input type="text" id="edit-motivo" required />
+          </div>
+          <div class="field">
+            <label>Fecha y Hora</label>
+            <input type="datetime-local" id="edit-fecha" required />
+          </div>
+          <div style="display: flex; gap: 1rem; margin-top: 1rem">
+            <button type="submit" class="btn" style="flex: 1">
+              Guardar Cambios
+            </button>
+            <button
+              type="button"
+              class="btn light"
+              onclick="cerrarModal()"
+              style="flex: 1"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container" style="padding: 2rem 0; text-align: center">
+        <small>© 2025 Salud Animalia - Panel Administrativo</small>
+      </div>
+    </footer>
+
+    <script src="/static/js/api_frontend.js"></script>
+    <script>
+      let reservaEditando = null;
+
+      function cambiarTab(tab) {
+        document
+          .querySelectorAll('.tab-btn')
+          .forEach((btn) => btn.classList.remove('active'));
+        document
+          .querySelectorAll('.tab-panel')
+          .forEach((panel) => (panel.style.display = 'none'));
+
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById(`panel-${tab}`).style.display = 'block';
+
+        if (tab === 'reservas') cargarReservasAdmin();
+        else if (tab === 'usuarios') cargarUsuariosAdmin();
+      }
+
+      async function cargarEstadisticas() {
+        try {
+          const resUsers = await apiRequest('/api/users', 'GET');
+          const resReservas = await apiRequest('/api/reservas/admin', 'GET');
+
+          if (resUsers.ok) {
+            document.getElementById('num-users').textContent =
+              resUsers.users.length;
+          }
+
+          if (resReservas.ok) {
+            const total = resReservas.reservas.length;
+            const pendientes = resReservas.reservas.filter(
+              (r) => new Date(r.fecha) > new Date()
+            ).length;
+            document.getElementById('num-reservas').textContent = total;
+            document.getElementById('num-pendientes').textContent = pendientes;
+          }
+        } catch (error) {
+          console.error('Error al cargar estadísticas:', error);
+        }
+      }
+
+      async function cargarReservasAdmin() {
+        const filtro = document
+          .getElementById('filtro-reservas')
+          .value.toLowerCase();
+        const tbody = document.getElementById('tabla-reservas');
+        tbody.innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:2rem;">Cargando...</td></tr>';
+
+        try {
+          const res = await apiRequest('/api/reservas/admin', 'GET');
+
+          if (res.ok && res.reservas && res.reservas.length) {
+            let reservas = res.reservas;
+
+            if (filtro) {
+              reservas = reservas.filter(
+                (r) =>
+                  r.mascota.toLowerCase().includes(filtro) ||
+                  r.motivo.toLowerCase().includes(filtro) ||
+                  (r.user_name && r.user_name.toLowerCase().includes(filtro)) ||
+                  (r.user_email && r.user_email.toLowerCase().includes(filtro))
+              );
+            }
+
+            if (reservas.length === 0) {
+              tbody.innerHTML =
+                '<tr><td colspan="7" style="text-align:center;padding:2rem;">No se encontraron reservas</td></tr>';
+              return;
+            }
+
+            tbody.innerHTML = '';
+            reservas.forEach((r) => {
+              const fecha = new Date(r.fecha);
+              const fechaFormateada = fecha.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              const esPasada = fecha < new Date();
+              const estadoColor = esPasada ? '#9ca3af' : '#0ea5a4';
+
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+            <td><strong>#${r.id}</strong></td>
+            <td>${r.user_name || 'N/A'}</td>
+            <td style="font-size:0.9rem;color:var(--muted);">${
+              r.user_email || 'N/A'
+            }</td>
+            <td><strong>${r.mascota}</strong></td>
+            <td>${r.motivo}</td>
+            <td style="color:${estadoColor};">${fechaFormateada}</td>
+            <td>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn secondary" onclick="editarReserva(${r.id})" 
+                        style="padding:0.5rem 0.8rem;font-size:0.85rem;">✏️ Editar</button>
+                <button class="btn" onclick="eliminarReservaAdmin(${r.id})" 
+                        style="padding:0.5rem 0.8rem;font-size:0.85rem;background:var(--danger);">🗑️</button>
+              </div>
+            </td>
+          `;
+              tbody.appendChild(tr);
+            });
+          } else {
+            tbody.innerHTML =
+              '<tr><td colspan="7" style="text-align:center;padding:2rem;">No hay reservas registradas</td></tr>';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          tbody.innerHTML =
+            '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--danger);">Error al cargar reservas</td></tr>';
+        }
+      }
+
+      async function editarReserva(id) {
+        try {
+          const res = await apiRequest(`/api/reservas/${id}`, 'GET');
+
+          if (res.ok && res.reserva) {
+            reservaEditando = res.reserva;
+            document.getElementById('edit-id').textContent = id;
+            document.getElementById('edit-mascota').value = res.reserva.mascota;
+            document.getElementById('edit-motivo').value = res.reserva.motivo;
+
+            const fecha = new Date(res.reserva.fecha);
+            const year = fecha.getFullYear();
+            const month = String(fecha.getMonth() + 1).padStart(2, '0');
+            const day = String(fecha.getDate()).padStart(2, '0');
+            const hours = String(fecha.getHours()).padStart(2, '0');
+            const minutes = String(fecha.getMinutes()).padStart(2, '0');
+            document.getElementById(
+              'edit-fecha'
+            ).value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+            document.getElementById('modal-editar').style.display = 'flex';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al cargar la reserva');
+        }
+      }
+
+      async function eliminarReservaAdmin(id) {
+        if (!confirm(`¿Estás seguro de eliminar la reserva #${id}?`)) return;
+
+        try {
+          const res = await apiRequest(`/api/reservas/${id}`, 'DELETE');
+
+          if (res.ok) {
+            alert('✅ Reserva eliminada exitosamente');
+            await cargarReservasAdmin();
+            await cargarEstadisticas();
+          } else {
+            alert('❌ ' + (res.error || 'No se pudo eliminar la reserva'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('❌ Error al eliminar la reserva');
+        }
+      }
+
+      function cerrarModal() {
+        document.getElementById('modal-editar').style.display = 'none';
+        reservaEditando = null;
+      }
+
+      async function cargarUsuariosAdmin() {
+        const filtro = document
+          .getElementById('filtro-usuarios')
+          .value.toLowerCase();
+        const tbody = document.getElementById('tabla-usuarios');
+        tbody.innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:2rem;">Cargando...</td></tr>';
+
+        try {
+          const res = await apiRequest('/api/users', 'GET');
+
+          if (res.ok && res.users && res.users.length) {
+            let usuarios = res.users;
+
+            if (filtro) {
+              usuarios = usuarios.filter(
+                (u) =>
+                  u.name.toLowerCase().includes(filtro) ||
+                  u.email.toLowerCase().includes(filtro)
+              );
+            }
+
+            if (usuarios.length === 0) {
+              tbody.innerHTML =
+                '<tr><td colspan="6" style="text-align:center;padding:2rem;">No se encontraron usuarios</td></tr>';
+              return;
+            }
+
+            tbody.innerHTML = '';
+
+            const resReservas = await apiRequest('/api/reservas/admin', 'GET');
+            const conteoReservas = {};
+            if (resReservas.ok) {
+              resReservas.reservas.forEach((r) => {
+                conteoReservas[r.user_id] =
+                  (conteoReservas[r.user_id] || 0) + 1;
+              });
+            }
+
+            usuarios.forEach((u) => {
+              const rolBadge =
+                u.role === 'admin'
+                  ? '<span class="badge" style="background:#fff0ee;color:#c2410c;border-color:#ffddd6;">Admin</span>'
+                  : '<span class="badge">Usuario</span>';
+
+              const numReservas = conteoReservas[u.id] || 0;
+
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+            <td><strong>#${u.id}</strong></td>
+            <td>${u.name}</td>
+            <td style="font-size:0.9rem;color:var(--muted);">${u.email}</td>
+            <td>${rolBadge}</td>
+            <td><strong>${numReservas}</strong> reservas</td>
+          `;
+              tbody.appendChild(tr);
+            });
+          } else {
+            tbody.innerHTML =
+              '<tr><td colspan="6" style="text-align:center;padding:2rem;">No hay usuarios registrados</td></tr>';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--danger);">Error al cargar usuarios</td></tr>';
+        }
+      }
+
+      document
+        .getElementById('form-editar')
+        .addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          if (!reservaEditando) return;
+
+          const mascota = document.getElementById('edit-mascota').value.trim();
+          const motivo = document.getElementById('edit-motivo').value.trim();
+          const fechaInput = document.getElementById('edit-fecha').value;
+
+          if (!mascota || !motivo || !fechaInput) {
+            alert('Completa todos los campos');
+            return;
+          }
+
+          const fecha = new Date(fechaInput).toISOString();
+
+          try {
+            const res = await apiRequest(
+              `/api/reservas/${reservaEditando.id}`,
+              'PUT',
+              {
+                mascota: mascota,
+                motivo: motivo,
+                fecha: fecha,
+              }
+            );
+
+            if (res.ok) {
+              alert('✅ Reserva actualizada exitosamente');
+              cerrarModal();
+              await cargarReservasAdmin();
+            } else {
+              alert('❌ ' + (res.error || 'No se pudo actualizar la reserva'));
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error al actualizar la reserva');
+          }
+        });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        if (!isAdmin()) {
+          alert('❌ Acceso solo para administradores');
+          window.location.href = '/login';
+          return;
+        }
+
+        cargarEstadisticas();
+        cargarReservasAdmin();
+      });
+    </script>
+
+    <style>
+      .tab-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .tab-btn:hover {
+        color: var(--brand);
+      }
+
+      .tab-btn.active {
+        color: var(--brand);
+        border-bottom-color: var(--brand);
+      }
+
+      .tab-panel {
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </body>
+</html>
